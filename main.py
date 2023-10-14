@@ -1,7 +1,6 @@
 import telebot
-from telebot import types
 import psycopg2
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 import scenatries
@@ -41,34 +40,32 @@ def get_group_number(message):
 def checker(call):
     if call.data == 'yes':
         markup = InlineKeyboardMarkup()
-        new_button = InlineKeyboardButton('Хочу узнать расписание на сегодня', callback_data='schedule_today')
-        markup.add(new_button)
+        teacher_button = InlineKeyboardButton('Хочу узнать расписание преподователя', callback_data='schedule_teacher_today')
+        student_button_today = InlineKeyboardButton('Хочу узнать расписание на сегодня', callback_data='schedule_today')
+        # student_button_tomorrow = InlineKeyboardButton('Хочу узнать расписание на завтра', callback_data='schedule_tomorrow')
+        markup.add(student_button_today,teacher_button)
         bot.send_message(chat_id, 'Запомню :)',reply_markup=markup)
     elif call.data == 'no':
         bot.send_message(chat_id, 'напиши пожалуйста из какой ты на самом деле группы и мы решим эту проблему')
-    if call.data == 'schedule_today':
+    if call.data == 'schedule_teacher_today':
         cursor = conn.cursor()
-        cursor.execute("SELECT campus, classroom, teacher,discipline, start_time, end_time FROM schedule WHERE group_name = 'M45' AND day_of_week = 'Вторник'")
+        cursor.execute("SELECT campus, classroom,discipline, start_time, end_time FROM schedule WHERE teacher = 'Сушкин' AND day_of_week = 'Вторник'")
         data = cursor.fetchall()
-        bot.send_message(chat_id, 'Сегодня тебя ждут следующие испытания')
+        bot.send_message(chat_id, 'Сегодня этого преподавателя можно найти тут')
         lesson = ""
         for lesson_data in data:
-            lesson = f"{lesson_data[3]} \nКорпус {lesson_data[0]} Аудитория {lesson_data[1]} \nПреподователь {lesson_data[2]} \nc {lesson_data[4]} до {lesson_data[5]} \n \n {lesson}"
-
+            lesson = f"{lesson_data[2]} \nКорпус {lesson_data[0]} Аудитория {lesson_data[1]} \nc {lesson_data[3]} до {lesson_data[4]} \n \n {lesson}"
         bot.send_message(chat_id, lesson)
-
-@bot.callback_query_handler(func=lambda call: True)
-def schedule(call):
     if call.data == 'schedule_today':
-        cursor = conn.cursor()
-        cursor.execute("SELECT campus, classroom, teacher,discipline, start_time, end_time FROM schedule WHERE group_name = 'M45' AND day_of_week = 'Вторник'")
-        data = cursor.fetchall()
-        bot.send_message(chat_id, 'Сегодня тебя ждут следующие испытания')
-        lesson = ""
-        for lesson_data in data:
-            lesson = f"{lesson_data[3]} \nКорпус {lesson_data[0]} Аудитория {lesson_data[1]} \nПреподователь {lesson_data[2]} \nc {lesson_data[4]} до {lesson_data[5]} \n \n {lesson}"
-
-        bot.send_message(chat_id, lesson)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT campus, classroom, teacher,discipline, start_time, end_time FROM schedule WHERE group_name = 'M45' AND day_of_week = 'Вторник'")
+            data = cursor.fetchall()
+            bot.send_message(chat_id, 'Сегодня тебя ждут следующие испытания')
+            lesson = ""
+            for lesson_data in data:
+                lesson = f"{lesson_data[3]} \nКорпус {lesson_data[0]} Аудитория {lesson_data[1]} \nПреподователь {lesson_data[2]} \nc {lesson_data[4]} до {lesson_data[5]} \n \n {lesson}"
+            bot.send_message(chat_id, lesson)
 
 
 
