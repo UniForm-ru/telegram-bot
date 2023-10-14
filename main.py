@@ -46,11 +46,14 @@ def schedule(message):
     # keyboard.add(button1)
     if message.text == "Хочу узнать расписание на сегодня":
         cursor = conn.cursor()
-        cursor.execute("SELECT start_time FROM schedule WHERE group_name = %s", (group))
-        start_time = cursor.fetchone()
-        cursor.execute("SELECT end_time FROM schedule WHERE group_name = %s", (group))
-        end_time = cursor.fetchone()
-        bot.send_message(message.chat.id, f"сегодня у тебя занятиe с  {start_time[0]} до {end_time[0]}")
+        cursor.execute("SELECT campus, classroom, teacher,discipline, start_time, end_time FROM schedule WHERE group_name = 'M45' AND day_of_week = 'Вторник'")
+        data = cursor.fetchall()
+        bot.send_message(message.chat.id, 'Сегодня тебя ждут следующие испытания')
+        lesson = ""
+        for lesson_data in data:
+            lesson = f"{lesson_data[3]} \nКорпус {lesson_data[0]} Аудитория {lesson_data[1]} \nПреподователь {lesson_data[2]} \nc {lesson_data[4]} до {lesson_data[5]} \n \n {lesson}"
+
+        bot.send_message(message.chat.id, lesson)
 
 
 
