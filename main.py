@@ -40,12 +40,16 @@ def get_group_number(message):
     cursor = conn.cursor()
     cursor.execute("SELECT group_number FROM users WHERE student_id = %s", (student_id,))
     group = cursor.fetchone()
-    markup = InlineKeyboardMarkup()
-    button2 = InlineKeyboardButton('Мимо', callback_data='no')
-    button1 = InlineKeyboardButton('Угадал)', callback_data='yes')
-    markup.add(button1, button2)
-    bot.send_message(message.chat.id, f"Ты из группы {group[0]}?", reply_markup=markup)
-    # bot.register_next_step_handler(call, checker)
+    if group:
+        markup = InlineKeyboardMarkup()
+        button2 = InlineKeyboardButton('Мимо', callback_data='no')
+        button1 = InlineKeyboardButton('Угадал)', callback_data='yes')
+        markup.add(button1, button2)
+        bot.send_message(message.chat.id, f"Ты из группы {group[0]}?", reply_markup=markup)
+    else:
+        bot.send_message(chat_id, 'Данного пользователя нет в системе,проверь номер или обратись в деканат')
+        bot.register_next_step_handler(message, get_group_number)
+
 
 # Обрабатываем нажатие на кнопки
 @bot.callback_query_handler(func=lambda call: True)
