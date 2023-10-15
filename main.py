@@ -9,9 +9,9 @@ bot = telebot.TeleBot('6632246938:AAG9-k_TMuw6mhylWLPjFu6NvPbI6diZ8oo')
 # Подключаемся к базе данных
 conn = psycopg2.connect(
     host="localhost",
-    database="UniFormBot",
-    user="postgres",
-    password="8521946733"
+    database="",
+    user="",
+    password=""
 )
 cur = conn.cursor()
 cur.execute(CREATE_TABLE_SCHEDULE)
